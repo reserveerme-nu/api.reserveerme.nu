@@ -29,7 +29,7 @@ namespace api.reserveerme.nu
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<MySqlContext>(options => options.UseSqlServer(Configuration.GetConnectionString(nameof(MySql))));
+            services.AddDbContextPool<MySqlContext>(options => options.UseMySql(Configuration.GetConnectionString(nameof(MySql))));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
