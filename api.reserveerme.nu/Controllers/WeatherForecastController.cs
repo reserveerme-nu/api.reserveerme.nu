@@ -36,4 +36,4 @@ namespace api.reserveerme.nu.Controllers
                 .ToArray();
         }
     }
-}
+} 
