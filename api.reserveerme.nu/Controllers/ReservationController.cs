@@ -25,10 +25,18 @@ namespace api.reserveerme.nu.Controllers
         private readonly ILogger<WeatherForecastController> _logger;
 
         [HttpGet]
-        [Route("{roomId}/{reservationId}")]
-        public async Task<ActionResult<ReservationViewModel>> Get(int roomId, int reservationId)
+        [Route("reservationId}")]
+        public async Task<ActionResult<ReservationViewModel>> Get(int reservationId)
         {
-            var reservation = await _dataAccessProvider.Read(roomId, reservationId);
+            var reservation = await _dataAccessProvider.Read(reservationId);
+            return Ok(new ReservationViewModel(reservation));
+        }
+        
+        [HttpGet]
+        [Route("room/{roomId}")]
+        public async Task<ActionResult<ReservationViewModel>> GetReservationsOfRoom(int roomId)
+        {
+            var reservation = await _dataAccessProvider.Read(reservationId);
             return Ok(new ReservationViewModel(reservation));
         }
 
@@ -40,7 +48,7 @@ namespace api.reserveerme.nu.Controllers
                 return BadRequest();
             }
             var reservation = new Reservation(reservationViewModel);
-            await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
+            await _dataAccessProvider.Add(reservation);
             return Created("/reservations", reservationViewModel);
         }
     }

@@ -5,7 +5,7 @@ namespace api.reserveerme.nu.ViewModels
 {
     public class ReservationViewModel
     {
-        public int RoomId { get; set; }
+        public RoomViewModel Room { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
         public UserViewModel Issuer { get; set; }

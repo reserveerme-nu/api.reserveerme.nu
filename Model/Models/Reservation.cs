@@ -9,7 +9,7 @@ namespace Model.Models
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
         public User Issuer { get; set; }
-        public int RoomId { get; set; }
+        public Room Room { get; set; }
 
         public Reservation()
         {
@@ -21,7 +21,7 @@ namespace Model.Models
             this.DateStart = reservationViewModel.DateStart;
             this.DateEnd = reservationViewModel.DateEnd;
             this.Issuer = new User(reservationViewModel.Issuer);
-            this.RoomId = reservationViewModel.RoomId;
+            this.Room = new Room(reservationViewModel.Room);
         }
     }
 }

@@ -7,6 +7,7 @@ namespace DAL
     public class MySqlContext : DbContext
     {
         public DbSet<Room> Rooms { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
         
         public MySqlContext(DbContextOptions<MySqlContext> options)
             : base(options)

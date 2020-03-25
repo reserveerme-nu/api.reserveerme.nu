@@ -26,9 +26,9 @@ namespace api.reserveerme.nu.Controllers
 
         [HttpGet]
         [Route("{roomId}/{reservationId}")]
-        public async Task<ActionResult<ReservationViewModel>> Get(int roomId, int reservationId)
+        public async Task<ActionResult<ReservationViewModel>> Get(int reservationId)
         {
-            var reservation = await _dataAccessProvider.Read(roomId, reservationId);
+            var reservation = await _dataAccessProvider.Read(reservationId);
             return Ok(new ReservationViewModel(reservation));
         }
 

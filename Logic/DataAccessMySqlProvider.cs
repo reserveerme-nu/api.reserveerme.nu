@@ -24,21 +24,25 @@ namespace Logic
             await _context.SaveChangesAsync();
         }
 
-        public async Task Add(Reservation reservation, int roomId)
+        public async Task Add(Reservation reservation)
         {
-            var room = await _context.Rooms.FirstAsync(p => p.Id == roomId);
-            if (room.Reservations == null)
-            {
-                room.Reservations = new List<Reservation>();
-            }
-            room.Reservations.Add(reservation);
+            var room = await _context.Rooms.FirstAsync(p => p.Name == reservation.Room.Name);
+            reservation.Room = room;
+            _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Reservation> Read(int roomId, int reservationId)
+        public async Task<Reservation> Read(int reservationId)
         {
-            var room = await _context.Rooms.FirstAsync(p => p.Id == roomId);
-            return room.Reservations.First(p => p.Id == reservationId);
+            var reservation = await _context.Reservations.FirstAsync(p => p.Id == reservationId);
+            return reservation;
+        }
+
+        public Task<List<Reservation>> ReadAll(int roomId)
+        {
+            var room = _context.Rooms.FirstAsync(p => p.Id == roomId);
+            var reservations = _context.Entry(room).Collection("Rooms").Load();
+            return null;
         }
 
         public Task Update(Reservation reservation)
