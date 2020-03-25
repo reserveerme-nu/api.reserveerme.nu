@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DAL;
+using Logic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Model.Enums;
+using Model.Interfaces;
 
 namespace api.reserveerme.nu
 {
@@ -30,6 +32,7 @@ namespace api.reserveerme.nu
         {
             services.AddControllers();
             services.AddDbContextPool<MySqlContext>(options => options.UseMySql(Configuration.GetConnectionString(nameof(MySql))));
+            services.AddScoped<IDataAccessProvider, DataAccessMySqlProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

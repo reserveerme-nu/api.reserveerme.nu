@@ -17,7 +17,6 @@ namespace DAL
                 .Build();
             var builder = new DbContextOptionsBuilder<MySqlContext>();
             var connectionString = configuration.GetConnectionString("MySql");
-            Console.WriteLine(connectionString + "yes");
             builder.UseMySql(connectionString);
             return new MySqlContext(builder.Options);
         }
