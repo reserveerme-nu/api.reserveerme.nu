@@ -41,6 +41,15 @@ namespace Logic
             return room.Reservations.First(p => p.Id == reservationId);
         }
 
+        public async Task<List<Room>> ReadAll(int roomId)
+        {
+            var room = await _context.Rooms.FirstAsync(p => p.Id == roomId);
+            var reservations = _context.Rooms
+                .Include(b => b.Reservations.Select(p => p.Issuer))
+                .ToList();
+            return reservations;
+        }
+
         public Task Update(Reservation reservation)
         {
             throw new NotImplementedException();

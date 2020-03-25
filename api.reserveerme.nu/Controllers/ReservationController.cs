@@ -32,6 +32,19 @@ namespace api.reserveerme.nu.Controllers
             return Ok(new ReservationViewModel(reservation));
         }
 
+        [HttpGet]
+        [Route("room/{roomId}")]
+        public async Task<ActionResult<List<RoomViewModel>>> GetAll(int roomId)
+        {
+            var rooms = await _dataAccessProvider.ReadAll(roomId);
+            var models = new List<RoomViewModel>();
+            foreach (var r in rooms)
+            {
+                models.Add(new RoomViewModel(r));
+            }
+            return Ok(models);
+        }
+
         [HttpPost]
         public async Task<ActionResult<ReservationViewModel>> Post([FromBody]ReservationViewModel reservationViewModel)
         {
