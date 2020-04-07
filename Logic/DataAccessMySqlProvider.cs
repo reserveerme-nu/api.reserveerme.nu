@@ -53,7 +53,7 @@ namespace Logic
                 var reservations = room.Reservations;
                 foreach (var reservation in reservations)
                 {
-                    if (reservation.DateEnd > DateTime.Now && reservation.DateStart < DateTime.Now)
+                    if (DateTime.Compare(DateTime.Now, reservation.DateStart) > 0 && DateTime.Compare(DateTime.Now, reservation.DateEnd) < 0)
                     {
                         return "reserved";
                     }

@@ -26,7 +26,8 @@ namespace Model.Models
 
         public Reservation(InstantReservationViewModel reservationViewModel)
         {
-            this.DateStart = RoundUp(DateTime.Now, TimeSpan.FromMinutes(15));
+            //this.DateStart = RoundUp(DateTime.Now, TimeSpan.FromMinutes(15));
+            this.DateStart = DateTime.Now;
             this.DateEnd = this.DateStart.AddMinutes(reservationViewModel.Duration);
             this.Issuer = new User();
             this.RoomId = reservationViewModel.RoomId;
