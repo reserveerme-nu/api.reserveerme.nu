@@ -41,6 +41,20 @@ namespace Logic
             return room.Reservations.First(p => p.Id == reservationId);
         }
 
+        public async Task<string> GetStatus(int roomId)
+        {
+            var room = await _context.Rooms.FirstAsync(p => p.Id == roomId);
+            var reservations = room.Reservations;
+            foreach (var reservation in reservations)
+            {
+                if (reservation.DateEnd > DateTime.Now && reservation.DateStart < DateTime.Now)
+                {
+                    return "reserved";
+                }
+            }
+            return "free";
+        }
+
         public async Task<List<Room>> ReadAll(int roomId)
         {
             var room = await _context.Rooms.FirstAsync(p => p.Id == roomId);

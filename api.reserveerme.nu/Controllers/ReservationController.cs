@@ -45,6 +45,14 @@ namespace api.reserveerme.nu.Controllers
             return Ok(models);
         }
 
+        [HttpGet]
+        [Route("status/{roomId}")]
+        public async Task<ActionResult<List<RoomViewModel>>> GetStatus(int roomId)
+        {
+            var status= await _dataAccessProvider.GetStatus(roomId);
+            return Ok(status);
+        }
+
         [HttpPost]
         public async Task<ActionResult<ReservationViewModel>> Post([FromBody]ReservationViewModel reservationViewModel)
         {
