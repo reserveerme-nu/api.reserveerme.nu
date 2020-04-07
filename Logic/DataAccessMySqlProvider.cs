@@ -43,23 +43,32 @@ namespace Logic
 
         public async Task<string> GetStatus(int roomId)
         {
-            var room = await _context.Rooms.FirstAsync(p => p.Id == roomId);
-            var reservations = room.Reservations;
-            foreach (var reservation in reservations)
+            var test = await _context.Rooms.FirstAsync(p => p.Id == roomId);
+            var rooms = _context.Rooms
+                .Include(b => b.Reservations)
+                .ToList();
+            var room = rooms.FirstOrDefault(p => p.Id == roomId);
+            if (room != null)
             {
-                if (reservation.DateEnd > DateTime.Now && reservation.DateStart < DateTime.Now)
+                var reservations = room.Reservations;
+                foreach (var reservation in reservations)
                 {
-                    return "reserved";
+                    if (reservation.DateEnd > DateTime.Now && reservation.DateStart < DateTime.Now)
+                    {
+                        return "reserved";
+                    }
                 }
+                return "free";
             }
-            return "free";
+
+            throw new ArgumentException();
         }
 
         public async Task<List<Room>> ReadAll(int roomId)
         {
             var room = await _context.Rooms.FirstAsync(p => p.Id == roomId);
             var reservations = _context.Rooms
-                .Include(b => b.Reservations.Select(p => p.Issuer))
+                .Include(b => b.Reservations)
                 .ToList();
             return reservations;
         }
