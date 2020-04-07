@@ -61,6 +61,8 @@ namespace api.reserveerme.nu
 
             app.UseAuthorization();
 
+            app.UseCors(MyAllowSpecificOrigins);
+
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
