@@ -23,5 +23,18 @@ namespace Model.Models
             this.Issuer = new User(reservationViewModel.Issuer);
             this.RoomId = reservationViewModel.RoomId;
         }
+
+        public Reservation(InstantReservationViewModel reservationViewModel)
+        {
+            this.DateStart = RoundUp(DateTime.Now, TimeSpan.FromMinutes(15));
+            this.DateEnd = this.DateStart.AddMinutes(reservationViewModel.Duration);
+            this.Issuer = new User();
+            this.RoomId = reservationViewModel.RoomId;
+        }
+        
+        DateTime RoundUp(DateTime dt, TimeSpan d)
+        {
+            return new DateTime((dt.Ticks + d.Ticks - 1) / d.Ticks * d.Ticks, dt.Kind);
+        }
     }
 }

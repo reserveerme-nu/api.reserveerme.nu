@@ -64,5 +64,18 @@ namespace api.reserveerme.nu.Controllers
             await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
         }
+
+        [HttpPost]
+        [Route("add")]
+        public async Task<ActionResult<ReservationViewModel>> Add([FromBody]InstantReservationViewModel reservationViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var reservation = new Reservation(reservationViewModel);
+            await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
+            return Created("/reservations", reservationViewModel);
+        }
     }
 }
