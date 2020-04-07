@@ -54,6 +54,14 @@ namespace api.reserveerme.nu.Controllers
         }
 
         [HttpPost]
+        [Route("remove")]
+        public async Task<ActionResult<bool>> Remove([FromBody]RemoveReservationViewModel viewModel)
+        {
+            var status= await _dataAccessProvider.RemoveCurrentReservation(viewModel.RoomId);
+            return Ok(status);
+        }
+
+        [HttpPost]
         public async Task<ActionResult<ReservationViewModel>> Post([FromBody]ReservationViewModel reservationViewModel)
         {
             if (!ModelState.IsValid)

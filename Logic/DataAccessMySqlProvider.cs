@@ -55,13 +55,44 @@ namespace Logic
                 {
                     if (DateTime.Compare(DateTime.Now, reservation.DateStart) > 0 && DateTime.Compare(DateTime.Now, reservation.DateEnd) < 0)
                     {
-                        return "reserved";
+                        return "occupied";
                     }
                 }
                 return "free";
             }
 
             throw new ArgumentException();
+        }
+
+        public async Task<bool> RemoveCurrentReservation(int roomId)
+        {
+            var test = await _context.Rooms.FirstAsync(p => p.Id == roomId);
+            var rooms = _context.Rooms
+                .Include(b => b.Reservations)
+                .ToList();
+            var room = rooms.FirstOrDefault(p => p.Id == roomId);
+            Reservation r = null;
+            if (room != null)
+            {
+                var reservations = room.Reservations;
+                foreach (var reservation in reservations)
+                {
+                    if (DateTime.Compare(DateTime.Now, reservation.DateStart) > 0 && DateTime.Compare(DateTime.Now, reservation.DateEnd) < 0)
+                    {
+                        r = reservation;
+                        break;
+                    }
+                }
+            }
+
+            if (r != null)
+            {
+                room.Reservations.Remove(r);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<List<Room>> ReadAll(int roomId)
