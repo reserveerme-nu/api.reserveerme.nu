@@ -25,6 +25,7 @@ namespace api.reserveerme.nu
             Configuration = configuration;
         }
 
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -33,6 +34,17 @@ namespace api.reserveerme.nu
             services.AddControllers();
             services.AddDbContextPool<MySqlContext>(options => options.UseMySql(Configuration.GetConnectionString(nameof(MySql))));
             services.AddScoped<IDataAccessProvider, DataAccessMySqlProvider>();
+            
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(MyAllowSpecificOrigins,
+                    builder => {
+                        builder.WithOrigins("*");
+                        builder.WithMethods("*");
+                        builder.WithHeaders("*");
+                    });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
