@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.reserveerme.nu.ViewModels;
+using DAL;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Exchange.WebServices.Data;
 using Microsoft.Extensions.Logging;
 using Model.Interfaces;
 using Model.Models;
+using ExchangeService = Logic.ExchangeService;
 
 namespace api.reserveerme.nu.Controllers
 {
@@ -15,11 +18,14 @@ namespace api.reserveerme.nu.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly IDataAccessProvider _dataAccessProvider;
+        private readonly ExchangeService exchangeService;
 
         public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
             _dataAccessProvider = dataAccessProvider;
+            exchangeService = new ExchangeService();
+            
         }
         
         private readonly ILogger<WeatherForecastController> _logger;
@@ -84,6 +90,14 @@ namespace api.reserveerme.nu.Controllers
             var reservation = new Reservation(reservationViewModel);
             await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
+        }
+        
+        [HttpGet]
+        [Route("calendar")]
+        public async Task<ActionResult<List<AppointmentViewModel>>> GetCalendar()
+        {
+            var appointments = exchangeService.GetAppointments();
+            return Ok(appointments);
         }
     }
 }
