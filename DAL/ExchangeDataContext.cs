@@ -8,6 +8,7 @@ namespace DAL
 {
     public class ExchangeDataContext
     {
+        
         private ExchangeService Service
         {
             get
@@ -22,7 +23,7 @@ namespace DAL
         public IEnumerable<Appointment> GetAppointments()
         {
             // this week
-            DateTime startDate = new DateTime(2020, 4, 2);
+            DateTime startDate = DateTime.Today;
             DateTime endDate = startDate.AddDays(7);
 
             // load the default calendar

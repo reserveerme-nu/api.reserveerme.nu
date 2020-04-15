@@ -7,6 +7,7 @@ using DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Exchange.WebServices.Data;
 using Microsoft.Extensions.Logging;
+using Model.Exceptions;
 using Model.Interfaces;
 using Model.Models;
 using ExchangeService = Logic.ExchangeService;
@@ -104,13 +105,21 @@ namespace api.reserveerme.nu.Controllers
         [Route("calendar")]
         public async Task<ActionResult<ReservationViewModel>> Add([FromBody]AppointmentViewModel appointmentViewModel)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest();
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
 
-            exchangeService.CreateNewAppointment(appointmentViewModel);
-            return Created("/reservations/calendar", appointmentViewModel);
+                exchangeService.CreateNewAppointment(appointmentViewModel);
+                return Created("/reservations/calendar", appointmentViewModel);
+            }
+            catch (AppointmentTimeSlotNotAvailableException e)
+            {
+                Console.WriteLine("TIMESLOT NOT AVAILABLE");
+                return Conflict("timeslot not available");
+            }
         }
     }
 }

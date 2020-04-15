@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.reserveerme.nu.ViewModels;
 using DAL;
 using Microsoft.Exchange.WebServices.Data;
+using Model.Exceptions;
 using Model.Models;
 
 namespace Logic
@@ -37,6 +38,13 @@ namespace Logic
         
         public void CreateNewAppointment(AppointmentViewModel avm)
         {
+            foreach (var appointment in exchange.GetAppointments())
+            {
+                if (avm.Start <= appointment.End && appointment.Start <= avm.End)
+                {
+                    throw new AppointmentTimeSlotNotAvailableException();
+                }
+            }
             exchange.CreateNewAppointment(avm);
         }
     }
