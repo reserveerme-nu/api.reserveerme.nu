@@ -23,6 +23,7 @@ namespace Logic
             {
                 var avm = new AppointmentViewModel
                 {
+                    Id = appointment.Id.UniqueId,
                     Subject = appointment.Subject,
                     Body = appointment.Body.Text,
                     Start = appointment.Start,
