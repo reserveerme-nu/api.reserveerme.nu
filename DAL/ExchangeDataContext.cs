@@ -24,7 +24,7 @@ namespace DAL
         {
             // this week
             DateTime startDate = DateTime.Today;
-            DateTime endDate = startDate.AddDays(7);
+            DateTime endDate = startDate.AddDays(1);
 
             // load the default calendar
             CalendarFolder calendar = CalendarFolder.Bind(Service, WellKnownFolderName.Calendar, new PropertySet());
