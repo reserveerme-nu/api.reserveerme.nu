@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using api.reserveerme.nu.ViewModels;
-using DAL;
+using Logic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Exchange.WebServices.Data;
 using Microsoft.Extensions.Logging;
 using Model.Exceptions;
 using Model.Interfaces;
 using Model.Models;
-using ExchangeService = Logic.ExchangeService;
+
 
 namespace api.reserveerme.nu.Controllers
 {
@@ -19,13 +17,13 @@ namespace api.reserveerme.nu.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly IDataAccessProvider _dataAccessProvider;
-        private readonly ExchangeService exchangeService;
+        private readonly ExchangeLogic _exchangeLogic;
 
         public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
             _dataAccessProvider = dataAccessProvider;
-            exchangeService = new ExchangeService();
+            _exchangeLogic = new ExchangeLogic();
             
         }
         
@@ -97,7 +95,7 @@ namespace api.reserveerme.nu.Controllers
         [Route("calendar")]
         public async Task<ActionResult<List<AppointmentViewModel>>> Get()
         {
-            var appointments = exchangeService.GetAppointments();
+            var appointments = _exchangeLogic.GetAppointments();
             return Ok(appointments);
         }
         
@@ -112,7 +110,7 @@ namespace api.reserveerme.nu.Controllers
                     return BadRequest();
                 }
 
-                exchangeService.CreateNewAppointment(appointmentViewModel);
+                _exchangeLogic.CreateNewAppointment(appointmentViewModel);
                 return Created("/reservations/calendar", appointmentViewModel);
             }
             catch (AppointmentTimeSlotNotAvailableException e)

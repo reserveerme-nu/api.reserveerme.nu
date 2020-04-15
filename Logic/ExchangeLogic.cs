@@ -10,7 +10,7 @@ using Model.Models;
 
 namespace Logic
 {
-    public class ExchangeService
+    public class ExchangeLogic
     {
         
         ExchangeDataContext exchange = new ExchangeDataContext();
