@@ -94,10 +94,23 @@ namespace api.reserveerme.nu.Controllers
         
         [HttpGet]
         [Route("calendar")]
-        public async Task<ActionResult<List<AppointmentViewModel>>> GetCalendar()
+        public async Task<ActionResult<List<AppointmentViewModel>>> Get()
         {
             var appointments = exchangeService.GetAppointments();
             return Ok(appointments);
+        }
+        
+        [HttpPost]
+        [Route("calendar")]
+        public async Task<ActionResult<ReservationViewModel>> Add([FromBody]AppointmentViewModel appointmentViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            exchangeService.CreateNewAppointment(appointmentViewModel);
+            return Created("/reservations/calendar", appointmentViewModel);
         }
     }
 }

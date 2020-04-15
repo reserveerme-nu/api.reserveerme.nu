@@ -16,18 +16,28 @@ namespace Logic
         
         public IEnumerable<AppointmentViewModel> GetAppointments()
         {
-            List<AppointmentViewModel> appointments = new List<AppointmentViewModel>();
+            var appointments = new List<AppointmentViewModel>();
 
             foreach (var appointment in exchange.GetAppointments())
             {
-                AppointmentViewModel avm = new AppointmentViewModel();
-                avm.Subject = appointment.Subject;
-                avm.Body = appointment.Body.Text;
-                
+                var avm = new AppointmentViewModel
+                {
+                    Subject = appointment.Subject,
+                    Body = appointment.Body.Text,
+                    Start = appointment.Start,
+                    End = appointment.End,
+                    Location = appointment.Location
+                };
+
                 appointments.Add(avm);
             }
 
             return appointments;
+        }
+        
+        public void CreateNewAppointment(AppointmentViewModel avm)
+        {
+            exchange.CreateNewAppointment(avm);
         }
     }
 }
