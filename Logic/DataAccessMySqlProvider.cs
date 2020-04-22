@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DAL;
 using Microsoft.EntityFrameworkCore;
+using Model.Enums;
 using Model.Interfaces;
 using Model.Models;
 
@@ -41,13 +42,15 @@ namespace Logic
             return room.Reservations.First(p => p.Id == reservationId);
         }
 
-        public async Task<string> GetStatus(int roomId)
+        public async Task<Status> GetStatus(int roomId)
         {
             var test = await _context.Rooms.FirstAsync(p => p.Id == roomId);
             var rooms = _context.Rooms
                 .Include(b => b.Reservations)
                 .ToList();
             var room = rooms.FirstOrDefault(p => p.Id == roomId);
+            var status = new Status();
+            status.StatusType = StatusType.Free;
             if (room != null)
             {
                 var reservations = room.Reservations;
@@ -55,10 +58,12 @@ namespace Logic
                 {
                     if (DateTime.Compare(DateTime.Now, reservation.DateStart) > 0 && DateTime.Compare(DateTime.Now, reservation.DateEnd) < 0)
                     {
-                        return "occupied";
+                        status.Reservation = reservation;
+                        status.StatusType = Model.Enums.StatusType.Reserved;
+                        return status;
                     }
                 }
-                return "free";
+                return status;
             }
 
             throw new ArgumentException();
