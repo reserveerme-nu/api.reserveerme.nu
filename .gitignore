@@ -9,6 +9,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 appsettings.json
+DAL/appsettings.json
 Web.config
 
 # User-specific files
@@ -360,6 +361,7 @@ MigrationBackup/
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 .idea
+Migrations/
 
 # User-specific stuff
 .idea/**/workspace.xml
