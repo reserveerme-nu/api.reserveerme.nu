@@ -8,6 +8,8 @@ namespace Model.Models
         public int Id { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
+        public DateTime MeetingDateStart { get; set; }
+        public DateTime MeetingDateEnd { get; set; }
         public String Issuer { get; set; }
         public int RoomId { get; set; }
 

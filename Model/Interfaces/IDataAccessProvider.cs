@@ -11,6 +11,7 @@ namespace Model.Interfaces
         Task<Reservation> Read(int roomId, int reservationId);
         Task<Status> GetStatus(int roomId);
         Task<bool> RemoveCurrentReservation(int roomId);
+        Task<bool> StartMeeting(int roomId);
         Task<List<Room>> ReadAll(int roomId);
         Task Update(Reservation reservation);
         Task Delete(Reservation reservation);

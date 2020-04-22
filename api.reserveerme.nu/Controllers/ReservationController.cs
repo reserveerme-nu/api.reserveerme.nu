@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Model.Interfaces;
 using Model.Models;
+using Model.ViewModels;
 
 namespace api.reserveerme.nu.Controllers
 {
@@ -58,6 +59,14 @@ namespace api.reserveerme.nu.Controllers
         public async Task<ActionResult<bool>> Remove([FromBody]RemoveReservationViewModel viewModel)
         {
             var status= await _dataAccessProvider.RemoveCurrentReservation(viewModel.RoomId);
+            return Ok(status);
+        }
+
+        [HttpPost]
+        [Route("start")]
+        public async Task<ActionResult<bool>> Start([FromBody]StartMeetingViewModel viewModel)
+        {
+            var status= await _dataAccessProvider.StartMeeting(viewModel.RoomId);
             return Ok(status);
         }
 
