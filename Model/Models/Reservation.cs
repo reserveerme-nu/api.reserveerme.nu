@@ -8,7 +8,7 @@ namespace Model.Models
         public int Id { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
-        public User Issuer { get; set; }
+        public String Issuer { get; set; }
         public int RoomId { get; set; }
 
         public Reservation()
@@ -20,7 +20,7 @@ namespace Model.Models
         {
             this.DateStart = reservationViewModel.DateStart;
             this.DateEnd = reservationViewModel.DateEnd;
-            this.Issuer = new User(reservationViewModel.Issuer);
+            this.Issuer = reservationViewModel.Issuer;
             this.RoomId = reservationViewModel.RoomId;
         }
 
@@ -29,8 +29,8 @@ namespace Model.Models
             //this.DateStart = RoundUp(DateTime.Now, TimeSpan.FromMinutes(15));
             this.DateStart = DateTime.Now;
             this.DateEnd = this.DateStart.AddMinutes(reservationViewModel.Duration);
-            this.Issuer = new User();
             this.RoomId = reservationViewModel.RoomId;
+            this.Issuer = reservationViewModel.Issuer;
         }
         
         DateTime RoundUp(DateTime dt, TimeSpan d)
