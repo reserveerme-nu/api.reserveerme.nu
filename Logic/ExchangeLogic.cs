@@ -10,7 +10,7 @@ using Model.Models;
 
 namespace Logic
 {
-    public class ExchangeLogic
+    public class ExchangeLogic : IExchangeLogic
     {
         
         ExchangeDataContext exchange = new ExchangeDataContext();
@@ -47,6 +47,11 @@ namespace Logic
                 }
             }
             exchange.CreateNewAppointment(avm);
+        }
+
+        public void SetCredentials(string username, string password)
+        {
+            exchange.SetCredentials(username, password);
         }
     }
 }

@@ -18,14 +18,14 @@ namespace api.reserveerme.nu.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly IDataAccessProvider _dataAccessProvider;
-        private readonly ExchangeLogic _exchangeLogic;
+        private readonly IExchangeLogic _exchangeLogic;
 
-        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<WeatherForecastController> logger)
+        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<WeatherForecastController> logger, IExchangeLogic exchangeLogic)
         {
             _logger = logger;
             _dataAccessProvider = dataAccessProvider;
-            _exchangeLogic = new ExchangeLogic();
-            
+            _exchangeLogic = exchangeLogic;
+
         }
         
         private readonly ILogger<WeatherForecastController> _logger;
@@ -83,6 +83,14 @@ namespace api.reserveerme.nu.Controllers
                 return BadRequest();
             }
             var reservation = new Reservation(reservationViewModel);
+            
+            var appointmentViewModel = new AppointmentViewModel();
+            appointmentViewModel.Body = reservation.Issuer;
+            appointmentViewModel.Start = reservation.DateStart;
+            appointmentViewModel.End = reservation.DateEnd;
+            appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
+            _exchangeLogic.CreateNewAppointment(appointmentViewModel);
+            
             await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
         }
@@ -96,6 +104,15 @@ namespace api.reserveerme.nu.Controllers
                 return BadRequest();
             }
             var reservation = new Reservation(reservationViewModel);
+            
+            var appointmentViewModel = new AppointmentViewModel();
+            appointmentViewModel.Body = reservation.Issuer;
+            appointmentViewModel.Start = reservation.DateStart;
+            appointmentViewModel.End = reservation.DateEnd;
+            appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
+            _exchangeLogic.CreateNewAppointment(appointmentViewModel);
+            
+            
             await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
         }
