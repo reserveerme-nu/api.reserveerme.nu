@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using api.reserveerme.nu.ViewModels;
 
 namespace Model.Models
@@ -24,6 +25,14 @@ namespace Model.Models
             this.DateEnd = reservationViewModel.DateEnd;
             this.Issuer = reservationViewModel.Issuer;
             this.RoomId = reservationViewModel.RoomId;
+        }
+
+        public Reservation(AddReservationViewModel addReservationViewModel)
+        {
+            this.DateStart = Convert.ToDateTime(addReservationViewModel.DateStart);
+            this.DateEnd = this.DateStart.AddMinutes(addReservationViewModel.Duration);
+            this.Issuer = addReservationViewModel.Issuer;
+            this.RoomId = addReservationViewModel.RoomId;
         }
 
         public Reservation(InstantReservationViewModel reservationViewModel)

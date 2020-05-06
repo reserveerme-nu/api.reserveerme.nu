@@ -8,7 +8,7 @@ namespace api.reserveerme.nu.ViewModels
         public int RoomId { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
-        public String Issuer { get; set; }
+        public string Issuer { get; set; }
 
         public ReservationViewModel()
         {

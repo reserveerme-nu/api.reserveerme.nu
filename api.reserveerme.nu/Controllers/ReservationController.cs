@@ -71,7 +71,7 @@ namespace api.reserveerme.nu.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ReservationViewModel>> Post([FromBody]ReservationViewModel reservationViewModel)
+        public async Task<ActionResult<ReservationViewModel>> Post([FromBody]InstantReservationViewModel reservationViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -84,7 +84,7 @@ namespace api.reserveerme.nu.Controllers
 
         [HttpPost]
         [Route("add")]
-        public async Task<ActionResult<ReservationViewModel>> Add([FromBody]InstantReservationViewModel reservationViewModel)
+        public async Task<ActionResult<ReservationViewModel>> Add([FromBody]AddReservationViewModel reservationViewModel)
         {
             if (!ModelState.IsValid)
             {
