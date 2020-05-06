@@ -8,7 +8,7 @@ namespace api.reserveerme.nu.ViewModels
         public int RoomId { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
-        public UserViewModel Issuer { get; set; }
+        public string Issuer { get; set; }
 
         public ReservationViewModel()
         {
@@ -19,7 +19,7 @@ namespace api.reserveerme.nu.ViewModels
         {
             this.DateStart = reservation.DateStart;
             this.DateEnd = reservation.DateEnd;
-            this.Issuer = new UserViewModel(reservation.Issuer);
+            this.Issuer = reservation.Issuer;
         }
     }
 }

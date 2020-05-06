@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Model.Exceptions;
 using Model.Interfaces;
 using Model.Models;
+using Model.ViewModels;
 
 
 namespace api.reserveerme.nu.Controllers
@@ -67,7 +68,15 @@ namespace api.reserveerme.nu.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ReservationViewModel>> Post([FromBody]ReservationViewModel reservationViewModel)
+        [Route("start")]
+        public async Task<ActionResult<bool>> Start([FromBody]StartMeetingViewModel viewModel)
+        {
+            var status= await _dataAccessProvider.StartMeeting(viewModel.RoomId);
+            return Ok(status);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ReservationViewModel>> Post([FromBody]InstantReservationViewModel reservationViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -80,7 +89,7 @@ namespace api.reserveerme.nu.Controllers
 
         [HttpPost]
         [Route("add")]
-        public async Task<ActionResult<ReservationViewModel>> Add([FromBody]InstantReservationViewModel reservationViewModel)
+        public async Task<ActionResult<ReservationViewModel>> Add([FromBody]AddReservationViewModel reservationViewModel)
         {
             if (!ModelState.IsValid)
             {

@@ -5,19 +5,29 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Model\Model.csproj" />
+      <None Remove="appsettings.Development.json" />
+      <None Remove="appsettings.json" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="appsettings.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <Content Include="appsettings.Development.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Include="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="DayPilot" Version="5.0.303" />
+      <ProjectReference Include="..\Model\Model.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.2" />
       <PackageReference Include="Microsoft.Exchange.WebServices" Version="2.2.0" />

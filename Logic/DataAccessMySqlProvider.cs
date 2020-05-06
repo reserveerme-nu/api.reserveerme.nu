@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DAL;
 using Microsoft.EntityFrameworkCore;
+using Model.Enums;
 using Model.Interfaces;
 using Model.Models;
 
@@ -41,13 +42,15 @@ namespace Logic
             return room.Reservations.First(p => p.Id == reservationId);
         }
 
-        public async Task<string> GetStatus(int roomId)
+        public async Task<Status> GetStatus(int roomId)
         {
             var test = await _context.Rooms.FirstAsync(p => p.Id == roomId);
             var rooms = _context.Rooms
                 .Include(b => b.Reservations)
                 .ToList();
             var room = rooms.FirstOrDefault(p => p.Id == roomId);
+            var status = new Status();
+            status.StatusType = StatusType.Free;
             if (room != null)
             {
                 var reservations = room.Reservations;
@@ -55,10 +58,19 @@ namespace Logic
                 {
                     if (DateTime.Compare(DateTime.Now, reservation.DateStart) > 0 && DateTime.Compare(DateTime.Now, reservation.DateEnd) < 0)
                     {
-                        return "occupied";
+                        status.Reservation = reservation;
+                        status.StatusType = Model.Enums.StatusType.Reserved;
+                        if (reservation.MeetingDateStart != DateTime.MinValue)
+                        {
+                            if (DateTime.Compare(DateTime.Now, reservation.MeetingDateStart) > 0 && DateTime.Compare(DateTime.Now, reservation.MeetingDateEnd) < 0 || DateTime.Compare(DateTime.Now, reservation.MeetingDateStart) > 0 && reservation.MeetingDateEnd == DateTime.MinValue)
+                            {
+                                status.StatusType = Model.Enums.StatusType.Occupied;
+                            }
+                        }
+                        return status;
                     }
                 }
-                return "free";
+                return status;
             }
 
             throw new ArgumentException();
@@ -87,7 +99,37 @@ namespace Logic
 
             if (r != null)
             {
-                room.Reservations.Remove(r);
+                r.DateEnd = DateTime.Now;
+                r.MeetingDateEnd = DateTime.Now;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+        public async Task<bool> StartMeeting(int roomId)
+        {
+            var rooms = _context.Rooms
+                .Include(b => b.Reservations)
+                .ToList();
+            var room = rooms.FirstOrDefault(p => p.Id == roomId);
+            Reservation r = null;
+            if (room != null)
+            {
+                var reservations = room.Reservations;
+                foreach (var reservation in reservations)
+                {
+                    if (DateTime.Compare(DateTime.Now, reservation.DateStart) > 0 && DateTime.Compare(DateTime.Now, reservation.DateEnd) < 0)
+                    {
+                        r = reservation;
+                        break;
+                    }
+                }
+            }
+
+            if (r != null)
+            {
+                r.MeetingDateStart = DateTime.Now;
                 await _context.SaveChangesAsync();
                 return true;
             }
