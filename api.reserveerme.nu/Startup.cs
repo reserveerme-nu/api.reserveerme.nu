@@ -34,7 +34,7 @@ namespace api.reserveerme.nu
             services.AddControllers();
             services.AddDbContextPool<MySqlContext>(options => options.UseMySql(Configuration.GetConnectionString(nameof(MySql))));
             services.AddScoped<IDataAccessProvider, DataAccessMySqlProvider>();
-            
+            services.AddSingleton<IExchangeLogic, ExchangeLogic>();
 
             services.AddCors(options =>
             {

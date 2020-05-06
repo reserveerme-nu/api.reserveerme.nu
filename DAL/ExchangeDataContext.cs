@@ -8,16 +8,24 @@ namespace DAL
 {
     public class ExchangeDataContext
     {
+        private string _username;
+        private string _password;
         
         private ExchangeService Service
         {
             get
             {
                 ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2010);
-                service.Credentials = new WebCredentials("409336@student.fontys.nl", "wachtwoord");
+                service.Credentials = new WebCredentials(_username, _password);
                 service.Url = new Uri("https://outlook.office365.com/ews/exchange.asmx");
                 return service;
             }
+        }
+
+        public void SetCredentials(string username, string password)
+        {
+            _username = username;
+            _password = password;
         }
         
         public IEnumerable<Appointment> GetAppointments()

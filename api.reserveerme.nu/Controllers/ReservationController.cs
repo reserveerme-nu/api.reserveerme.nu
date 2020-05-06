@@ -18,14 +18,14 @@ namespace api.reserveerme.nu.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly IDataAccessProvider _dataAccessProvider;
-        private readonly ExchangeLogic _exchangeLogic;
+        private readonly IExchangeLogic _exchangeLogic;
 
-        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<WeatherForecastController> logger)
+        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<WeatherForecastController> logger, IExchangeLogic exchangeLogic)
         {
             _logger = logger;
             _dataAccessProvider = dataAccessProvider;
-            _exchangeLogic = new ExchangeLogic();
-            
+            _exchangeLogic = exchangeLogic;
+
         }
         
         private readonly ILogger<WeatherForecastController> _logger;
