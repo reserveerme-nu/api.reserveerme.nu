@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using api.reserveerme.nu.ViewModels;
+using Logic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Model.Exceptions;
 using Model.Interfaces;
 using Model.Models;
 using Model.ViewModels;
+
 
 namespace api.reserveerme.nu.Controllers
 {
@@ -16,11 +18,14 @@ namespace api.reserveerme.nu.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly IDataAccessProvider _dataAccessProvider;
+        private readonly ExchangeLogic _exchangeLogic;
 
         public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
             _dataAccessProvider = dataAccessProvider;
+            _exchangeLogic = new ExchangeLogic();
+            
         }
         
         private readonly ILogger<WeatherForecastController> _logger;
@@ -93,6 +98,35 @@ namespace api.reserveerme.nu.Controllers
             var reservation = new Reservation(reservationViewModel);
             await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
+        }
+        
+        [HttpGet]
+        [Route("calendar")]
+        public async Task<ActionResult<List<AppointmentViewModel>>> Get()
+        {
+            var appointments = _exchangeLogic.GetAppointments();
+            return Ok(appointments);
+        }
+        
+        [HttpPost]
+        [Route("calendar")]
+        public async Task<ActionResult<ReservationViewModel>> Add([FromBody]AppointmentViewModel appointmentViewModel)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                _exchangeLogic.CreateNewAppointment(appointmentViewModel);
+                return Created("/reservations/calendar", appointmentViewModel);
+            }
+            catch (AppointmentTimeSlotNotAvailableException e)
+            {
+                Console.WriteLine("TIMESLOT NOT AVAILABLE");
+                return Conflict("timeslot not available");
+            }
         }
     }
 }
