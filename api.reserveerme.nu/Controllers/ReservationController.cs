@@ -9,6 +9,7 @@ using Model.Exceptions;
 using Model.Interfaces;
 using Model.Models;
 using Model.ViewModels;
+using WebSocketSharp;
 
 
 namespace api.reserveerme.nu.Controllers
@@ -112,6 +113,10 @@ namespace api.reserveerme.nu.Controllers
             appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
             _exchangeLogic.CreateNewAppointment(appointmentViewModel);
             
+            using (var ws = new WebSocket ("ws://localhost:6969/reservation")) {
+                ws.Connect ();
+                ws.Send ("INSERTMESSAGEHERE");
+            }
             
             await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
