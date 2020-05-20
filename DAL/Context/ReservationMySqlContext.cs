@@ -1,7 +1,11 @@
-﻿namespace DAL.MySQL.Contexts
+﻿using Model.Models;
+
+namespace DAL.MySQL.Contexts
 {
-    public class ReservationMySqlContext
+    public class ReservationMySqlContext : MySqlContext<Reservation>
     {
-        
+        public ReservationMySqlContext(string connectionString) : base(connectionString)
+        {
+        }
     }
 }

@@ -15,5 +15,6 @@ namespace Model.Interfaces
         Task<List<Room>> ReadAll(int roomId);
         Task Update(Reservation reservation);
         Task Delete(Reservation reservation);
+        Task<List<Room>> GetAllRooms();
     }
 }

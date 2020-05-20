@@ -16,13 +16,13 @@ namespace api.reserveerme.nu.Controllers
     {
         private readonly IDataAccessProvider _dataAccessProvider;
 
-        public RoomController(IDataAccessProvider dataAccessProvider, ILogger<WeatherForecastController> logger)
+        public RoomController(IDataAccessProvider dataAccessProvider, ILogger<RoomController> logger)
         {
             _logger = logger;
             _dataAccessProvider = dataAccessProvider;
         }
         
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<RoomController> _logger;
 
         [HttpGet]
         [Route("{roomId}/{reservationId}")]

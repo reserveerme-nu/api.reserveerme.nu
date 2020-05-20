@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.reserveerme.nu.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Model.Interfaces;
 using Model.Models;
@@ -16,14 +17,15 @@ namespace api.reserveerme.nu.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly IDataAccessProvider _dataAccessProvider;
+        
+        private readonly ILogger<ReservationController> _logger;
 
-        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<WeatherForecastController> logger)
+        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<ReservationController> logger, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _dataAccessProvider = dataAccessProvider;
+            serviceProvider.CreateScope();
         }
-        
-        private readonly ILogger<WeatherForecastController> _logger;
 
         [HttpGet]
         [Route("{roomId}/{reservationId}")]

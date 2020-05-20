@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Globalization;
 using api.reserveerme.nu.ViewModels;
+using Models;
+using Models.Utils;
 
 namespace Model.Models
 {
-    public class Reservation
+    public class Reservation : DatabaseItem
     {
-        public int Id { get; set; }
-        public DateTime DateStart { get; set; }
-        public DateTime DateEnd { get; set; }
-        public DateTime MeetingDateStart { get; set; }
-        public DateTime MeetingDateEnd { get; set; }
-        public String Issuer { get; set; }
-        public int RoomId { get; set; }
+        [Property] public DateTime DateStart { get; set; }
+        [Property] public DateTime DateEnd { get; set; }
+        [Property] public DateTime MeetingDateStart { get; set; }
+        [Property] public DateTime MeetingDateEnd { get; set; }
+        [Property] public String Issuer { get; set; }
+        [Property] public int RoomId { get; set; }
 
         public Reservation()
         {
