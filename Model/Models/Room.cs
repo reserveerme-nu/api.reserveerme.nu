@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using api.reserveerme.nu.ViewModels;
+using Models;
+using Models.Utils;
 
 namespace Model.Models
 {
-    public class Room
+    public class Room : DatabaseItem
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        [Property] public string Name { get; set; }
         public virtual ICollection<Reservation> Reservations { get; set; }
 
         public Room()
