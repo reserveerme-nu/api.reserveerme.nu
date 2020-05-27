@@ -597,3 +597,5 @@ fabric.properties
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 
 # End of https://www.gitignore.io/api/rider,visualstudio,visualstudiocode,csharp
+/DAL/appsettings.json
+/api.reserveerme.nu/appsettings.json
