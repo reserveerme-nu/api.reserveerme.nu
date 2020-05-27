@@ -115,7 +115,7 @@ namespace api.reserveerme.nu.Controllers
             appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
             _exchangeLogic.CreateNewAppointment(appointmentViewModel);
 
-            // await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
+            await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
         }
         
@@ -123,8 +123,15 @@ namespace api.reserveerme.nu.Controllers
         [Route("calendar")]
         public async Task<ActionResult<List<AppointmentViewModel>>> Get()
         {
-            var appointments = _exchangeLogic.GetAppointments();
-            return Ok(appointments);
+            try
+            {
+                var appointments = _exchangeLogic.GetAppointments();
+                return Ok(appointments);
+            }
+            catch (CalenderEmptyException e)
+            {
+                return NoContent();
+            }
         }
         
         [HttpPost]
@@ -146,6 +153,11 @@ namespace api.reserveerme.nu.Controllers
                 Console.WriteLine("TIMESLOT NOT AVAILABLE");
                 return Conflict("timeslot not available");
             }
+            catch (CalenderEmptyException e)
+            {
+                return 
+            }
+            
         }
     }
 }

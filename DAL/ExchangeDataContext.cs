@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using api.reserveerme.nu.ViewModels;
 using Microsoft.Exchange.WebServices.Data;
+using Model.Exceptions;
 
 namespace DAL
 {
@@ -41,9 +42,13 @@ namespace DAL
             CalendarView cView = new CalendarView(startDate, endDate, 50);
             cView.PropertySet = new PropertySet(AppointmentSchema.Subject, AppointmentSchema.Start, AppointmentSchema.End, AppointmentSchema.Id);
             FindItemsResults<Appointment> appointments = calendar.FindAppointments(cView);
+            if (appointments.Items.Count == 0)
+            {
+                throw new CalenderEmptyException();
+            }
 
             Service.LoadPropertiesForItems(appointments, PropertySet.FirstClassProperties);
-            
+             
             return appointments;
         }
         
