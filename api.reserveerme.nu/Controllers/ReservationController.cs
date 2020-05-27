@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.WebSockets;
+using System.Threading;
 using System.Threading.Tasks;
 using api.reserveerme.nu.ViewModels;
+using api.reserveerme.nu.WSControllers;
 using Logic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +13,7 @@ using Model.Exceptions;
 using Model.Interfaces;
 using Model.Models;
 using Model.ViewModels;
+using Websocket.Client;
 
 
 namespace api.reserveerme.nu.Controllers
@@ -110,9 +114,8 @@ namespace api.reserveerme.nu.Controllers
             appointmentViewModel.End = reservation.DateEnd;
             appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
             _exchangeLogic.CreateNewAppointment(appointmentViewModel);
-            
-            
-            await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
+
+            // await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
         }
         

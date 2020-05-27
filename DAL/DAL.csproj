@@ -24,6 +24,10 @@
 
     <ItemGroup>
       <PackageReference Include="DayPilot" Version="5.0.303" />
+      <PackageReference Include="System.Net.WebSockets" Version="4.3.0" />
+      <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
+      <PackageReference Include="Websocket.Client" Version="4.3.15" />
+      <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
       <ProjectReference Include="..\Model\Model.csproj" />
     </ItemGroup>
 
