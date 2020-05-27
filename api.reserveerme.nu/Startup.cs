@@ -35,14 +35,14 @@ namespace api.reserveerme.nu
         {
             services.AddControllers();
             services.AddDbContextPool<MySqlContext>(options => options.UseMySql(Configuration.GetConnectionString(nameof(MySql))));
-            services.AddScoped<IDataAccessProvider, DataAccessMySqlProvider>();
-            
+            services.AddScoped<IDataAccessProvider, DataAccessMySqlProvider>();        
             services.AddSingleton<IScheduledTask, CheckExpiredReservationsTask>();
             services.AddScheduler((sender, args) =>
             {
                 Console.Write(args.Exception.Message);
                 args.SetObserved();
             });
+            services.AddSingleton<IExchangeLogic, ExchangeLogic>();
             services.AddCors(options =>
             {
                 options.AddPolicy(MyAllowSpecificOrigins,

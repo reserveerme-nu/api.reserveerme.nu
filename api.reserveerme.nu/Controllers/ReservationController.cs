@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using api.reserveerme.nu.ViewModels;
+using Logic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Model.Exceptions;
 using Model.Interfaces;
 using Model.Models;
 using Model.ViewModels;
+
 
 namespace api.reserveerme.nu.Controllers
 {
@@ -16,15 +18,15 @@ namespace api.reserveerme.nu.Controllers
     [Route("reservations")]
     public class ReservationController : ControllerBase
     {
-        private readonly IDataAccessProvider _dataAccessProvider;
-        
+        private readonly IDataAccessProvider _dataAccessProvider;        
         private readonly ILogger<ReservationController> _logger;
+        private readonly IExchangeLogic _exchangeLogic;
 
-        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<ReservationController> logger, IServiceProvider serviceProvider)
+        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<ReservationController> logger, IExchangeLogic exchangeLogic)
         {
             _logger = logger;
             _dataAccessProvider = dataAccessProvider;
-            serviceProvider.CreateScope();
+            _exchangeLogic = exchangeLogic;
         }
 
         [HttpGet]
@@ -80,6 +82,14 @@ namespace api.reserveerme.nu.Controllers
                 return BadRequest();
             }
             var reservation = new Reservation(reservationViewModel);
+            
+            var appointmentViewModel = new AppointmentViewModel();
+            appointmentViewModel.Body = reservation.Issuer;
+            appointmentViewModel.Start = reservation.DateStart;
+            appointmentViewModel.End = reservation.DateEnd;
+            appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
+            _exchangeLogic.CreateNewAppointment(appointmentViewModel);
+            
             await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
         }
@@ -93,8 +103,46 @@ namespace api.reserveerme.nu.Controllers
                 return BadRequest();
             }
             var reservation = new Reservation(reservationViewModel);
+            
+            var appointmentViewModel = new AppointmentViewModel();
+            appointmentViewModel.Body = reservation.Issuer;
+            appointmentViewModel.Start = reservation.DateStart;
+            appointmentViewModel.End = reservation.DateEnd;
+            appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
+            _exchangeLogic.CreateNewAppointment(appointmentViewModel);
+            
+            
             await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
+        }
+        
+        [HttpGet]
+        [Route("calendar")]
+        public async Task<ActionResult<List<AppointmentViewModel>>> Get()
+        {
+            var appointments = _exchangeLogic.GetAppointments();
+            return Ok(appointments);
+        }
+        
+        [HttpPost]
+        [Route("calendar")]
+        public async Task<ActionResult<ReservationViewModel>> Add([FromBody]AppointmentViewModel appointmentViewModel)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                _exchangeLogic.CreateNewAppointment(appointmentViewModel);
+                return Created("/reservations/calendar", appointmentViewModel);
+            }
+            catch (AppointmentTimeSlotNotAvailableException e)
+            {
+                Console.WriteLine("TIMESLOT NOT AVAILABLE");
+                return Conflict("timeslot not available");
+            }
         }
     }
 }
