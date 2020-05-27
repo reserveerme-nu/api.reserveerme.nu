@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using api.reserveerme.nu.ViewModels;
 using DAL;
@@ -19,22 +20,26 @@ namespace Logic
         {
             var appointments = new List<AppointmentViewModel>();
 
-            foreach (var appointment in exchange.GetAppointments())
+            if (exchange.GetAppointments().Count() != 0)
             {
-                var avm = new AppointmentViewModel
+                foreach (var appointment in exchange.GetAppointments())
                 {
-                    Id = appointment.Id.UniqueId,
-                    Subject = appointment.Subject,
-                    Body = appointment.Body.Text,
-                    Start = appointment.Start,
-                    End = appointment.End,
-                    Location = appointment.Location
-                };
+                    var avm = new AppointmentViewModel
+                    {
+                        Id = appointment.Id.UniqueId,
+                        Subject = appointment.Subject,
+                        Body = appointment.Body.Text,
+                        Start = appointment.Start,
+                        End = appointment.End,
+                        Location = appointment.Location
+                    };
 
-                appointments.Add(avm);
+                    appointments.Add(avm);
+                }
+
+                return appointments;
             }
-
-            return appointments;
+            throw new CalenderEmptyException();
         }
         
         public void CreateNewAppointment(AppointmentViewModel avm)

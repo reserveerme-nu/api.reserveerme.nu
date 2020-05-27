@@ -155,7 +155,7 @@ namespace api.reserveerme.nu.Controllers
             }
             catch (CalenderEmptyException e)
             {
-                return 
+                return null;
             }
             
         }

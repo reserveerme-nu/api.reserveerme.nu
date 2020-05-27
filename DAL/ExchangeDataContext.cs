@@ -42,13 +42,15 @@ namespace DAL
             CalendarView cView = new CalendarView(startDate, endDate, 50);
             cView.PropertySet = new PropertySet(AppointmentSchema.Subject, AppointmentSchema.Start, AppointmentSchema.End, AppointmentSchema.Id);
             FindItemsResults<Appointment> appointments = calendar.FindAppointments(cView);
-            if (appointments.Items.Count == 0)
-            {
-                throw new CalenderEmptyException();
-            }
+            
 
+            if (appointments == null || appointments.Items.Count == 0)
+            {
+                var newAppointments = new List<Appointment>();
+                return newAppointments;
+            }
+            
             Service.LoadPropertiesForItems(appointments, PropertySet.FirstClassProperties);
-             
             return appointments;
         }
         
