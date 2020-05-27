@@ -137,12 +137,11 @@ namespace Logic
             return false;
         }
 
-        public async Task<List<Room>> ReadAll(int roomId)
+        public Task<List<Room>> ReadAll(int roomId)
         {
-            var room = await _context.Rooms.FirstAsync(p => p.Id == roomId);
             var reservations = _context.Rooms
                 .Include(b => b.Reservations)
-                .ToList();
+                .ToListAsync();
             return reservations;
         }
 
@@ -154,6 +153,11 @@ namespace Logic
         public Task Delete(Reservation reservation)
         {
             throw new NotImplementedException();
+        }
+
+        public Task<List<Room>> GetAllRooms()
+        {
+            return _context.Rooms.ToListAsync();
         }
     }
 }

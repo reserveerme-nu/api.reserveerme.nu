@@ -7,6 +7,7 @@ using api.reserveerme.nu.ViewModels;
 using api.reserveerme.nu.WSControllers;
 using Logic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Model.Exceptions;
 using Model.Interfaces;
@@ -21,18 +22,16 @@ namespace api.reserveerme.nu.Controllers
     [Route("reservations")]
     public class ReservationController : ControllerBase
     {
-        private readonly IDataAccessProvider _dataAccessProvider;
+        private readonly IDataAccessProvider _dataAccessProvider;        
+        private readonly ILogger<ReservationController> _logger;
         private readonly IExchangeLogic _exchangeLogic;
 
-        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<WeatherForecastController> logger, IExchangeLogic exchangeLogic)
+        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<ReservationController> logger, IExchangeLogic exchangeLogic)
         {
             _logger = logger;
             _dataAccessProvider = dataAccessProvider;
             _exchangeLogic = exchangeLogic;
-
         }
-        
-        private readonly ILogger<WeatherForecastController> _logger;
 
         [HttpGet]
         [Route("{roomId}/{reservationId}")]
