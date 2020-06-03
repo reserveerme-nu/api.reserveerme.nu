@@ -1,4 +1,5 @@
 ﻿using System;
+using Model.Enums;
 
 namespace api.reserveerme.nu.ViewModels
 {
@@ -10,5 +11,6 @@ namespace api.reserveerme.nu.ViewModels
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
         public string Location { get; set; }
+        public String Status { get; set; }
     }
 }

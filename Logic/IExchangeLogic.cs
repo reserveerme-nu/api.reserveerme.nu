@@ -8,5 +8,6 @@ namespace Logic
         public IEnumerable<AppointmentViewModel> GetAppointments();
         public void CreateNewAppointment(AppointmentViewModel avm);
         public void SetCredentials(string username, string password);
+        void StartMeeting(int viewModelRoomId);
     }
 }

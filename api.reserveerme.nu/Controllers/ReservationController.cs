@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Logic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Model.Enums;
 using Model.Exceptions;
 using Model.Interfaces;
 using Model.Models;
@@ -33,32 +35,54 @@ namespace api.reserveerme.nu.Controllers
             _exchangeLogic = exchangeLogic;
         }
 
-        [HttpGet]
-        [Route("{roomId}/{reservationId}")]
-        public async Task<ActionResult<ReservationViewModel>> Get(int roomId, int reservationId)
-        {
-            var reservation = await _dataAccessProvider.Read(roomId, reservationId);
-            return Ok(new ReservationViewModel(reservation));
-        }
-
-        [HttpGet]
-        [Route("room/{roomId}")]
-        public async Task<ActionResult<List<RoomViewModel>>> GetAll(int roomId)
-        {
-            var rooms = await _dataAccessProvider.ReadAll(roomId);
-            var models = new List<RoomViewModel>();
-            foreach (var r in rooms)
-            {
-                models.Add(new RoomViewModel(r));
-            }
-            return Ok(models);
-        }
+        // [HttpGet]
+        // [Route("{roomId}/{reservationId}")]
+        // public async Task<ActionResult<ReservationViewModel>> Get(int roomId, int reservationId)
+        // {
+        //     var reservation = await _dataAccessProvider.Read(roomId, reservationId);
+        //     return Ok(new ReservationViewModel(reservation));
+        // }
+        //
+        // [HttpGet]
+        // [Route("room/{roomId}")]
+        // public async Task<ActionResult<List<RoomViewModel>>> GetAll(int roomId)
+        // {
+        //     var rooms = await _dataAccessProvider.ReadAll(roomId);
+        //     var models = new List<RoomViewModel>();
+        //     foreach (var r in rooms)
+        //     {
+        //         models.Add(new RoomViewModel(r));
+        //     }
+        //     return Ok(models);
+        // }
 
         [HttpGet]
         [Route("status/{roomId}")]
-        public async Task<ActionResult<List<RoomViewModel>>> GetStatus(int roomId)
+        public async Task<ActionResult<Status>> GetStatus(int roomId)
         {
-            var status= await _dataAccessProvider.GetStatus(roomId);
+            var nextAppointment = _exchangeLogic.GetAppointments().First();
+            Status status = new Status();
+            Reservation reservation = new Reservation();
+            reservation.Issuer = nextAppointment.Body;
+            reservation.DateStart = nextAppointment.Start;
+            reservation.DateEnd = nextAppointment.End;
+
+            status.Reservation = reservation;
+            status.StatusType = StatusType.Free;
+            
+            if (DateTime.Now > reservation.DateStart)
+            {
+                switch (nextAppointment.Status)
+                {
+                    case "Occupied":
+                        status.StatusType = StatusType.Occupied;
+                        break;
+                    case "Reserved":
+                        status.StatusType = StatusType.Reserved;
+                        break;
+                }
+            }
+            
             return Ok(status);
         }
 
@@ -74,8 +98,8 @@ namespace api.reserveerme.nu.Controllers
         [Route("start")]
         public async Task<ActionResult<bool>> Start([FromBody]StartMeetingViewModel viewModel)
         {
-            var status= await _dataAccessProvider.StartMeeting(viewModel.RoomId);
-            return Ok(status);
+            _exchangeLogic.StartMeeting(viewModel.RoomId);
+            return Ok(true);
         }
 
         [HttpPost]
@@ -91,7 +115,7 @@ namespace api.reserveerme.nu.Controllers
             appointmentViewModel.Body = reservation.Issuer;
             appointmentViewModel.Start = reservation.DateStart;
             appointmentViewModel.End = reservation.DateEnd;
-            appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
+            appointmentViewModel.Subject = reservation.RoomId.ToString();
             _exchangeLogic.CreateNewAppointment(appointmentViewModel);
             
             await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
@@ -112,7 +136,7 @@ namespace api.reserveerme.nu.Controllers
             appointmentViewModel.Body = reservation.Issuer;
             appointmentViewModel.Start = reservation.DateStart;
             appointmentViewModel.End = reservation.DateEnd;
-            appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
+            appointmentViewModel.Subject = reservation.RoomId.ToString();
             _exchangeLogic.CreateNewAppointment(appointmentViewModel);
 
             await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
