@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,8 +8,10 @@ using api.reserveerme.nu.ViewModels;
 using api.reserveerme.nu.WSControllers;
 using Logic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Exchange.WebServices.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Model.Enums;
 using Model.Exceptions;
 using Model.Interfaces;
 using Model.Models;
@@ -34,48 +37,59 @@ namespace api.reserveerme.nu.Controllers
         }
 
         [HttpGet]
-        [Route("{roomId}/{reservationId}")]
-        public async Task<ActionResult<ReservationViewModel>> Get(int roomId, int reservationId)
-        {
-            var reservation = await _dataAccessProvider.Read(roomId, reservationId);
-            return Ok(new ReservationViewModel(reservation));
-        }
-
-        [HttpGet]
-        [Route("room/{roomId}")]
-        public async Task<ActionResult<List<RoomViewModel>>> GetAll(int roomId)
-        {
-            var rooms = await _dataAccessProvider.ReadAll(roomId);
-            var models = new List<RoomViewModel>();
-            foreach (var r in rooms)
-            {
-                models.Add(new RoomViewModel(r));
-            }
-            return Ok(models);
-        }
-
-        [HttpGet]
         [Route("status/{roomId}")]
-        public async Task<ActionResult<List<RoomViewModel>>> GetStatus(int roomId)
+        public async Task<ActionResult<Status>> GetStatus(int roomId)
         {
-            var status= await _dataAccessProvider.GetStatus(roomId);
-            return Ok(status);
-        }
-
-        [HttpPost]
-        [Route("remove")]
-        public async Task<ActionResult<bool>> Remove([FromBody]RemoveReservationViewModel viewModel)
-        {
-            var status= await _dataAccessProvider.RemoveCurrentReservation(viewModel.RoomId);
-            return Ok(status);
+            try
+            {
+                var nextAppointment = _exchangeLogic.GetCurrentAppointment(roomId);
+                Status status = new Status();
+                Reservation reservation = new Reservation();
+                reservation.Issuer = nextAppointment.Body;
+                reservation.DateStart = nextAppointment.Start;
+                reservation.DateEnd = nextAppointment.End;
+                
+                status.StatusType = StatusType.Free;
+                
+                if (DateTime.Now > reservation.DateStart)
+                {
+                    switch (nextAppointment.Status)
+                    {
+                        case "Occupied":
+                            status.Reservation = reservation;
+                            status.StatusType = StatusType.Occupied;
+                            break;
+                        case "Reserved":
+                            status.Reservation = reservation;
+                            status.StatusType = StatusType.Reserved;
+                            break;
+                    }
+                }
+            
+                return Ok(status);
+            }
+            catch (AppointmentNotExistantException e)
+            {
+                Status status = new Status();
+                status.StatusType = StatusType.Free;
+                return Ok(status);
+            }
         }
 
         [HttpPost]
         [Route("start")]
         public async Task<ActionResult<bool>> Start([FromBody]StartMeetingViewModel viewModel)
         {
-            var status= await _dataAccessProvider.StartMeeting(viewModel.RoomId);
-            return Ok(status);
+            _exchangeLogic.StartMeeting(viewModel.RoomId);
+            return Ok(true);
+        }
+        
+        [HttpPost]
+        [Route("remove")]
+        public async Task<ActionResult<bool>> Remove([FromBody]RemoveReservationViewModel viewModel)
+        {
+            var didDeleteAppointment = _exchangeLogic.EndCurrentAppointment(1);
+            return Ok(didDeleteAppointment);
         }
 
         [HttpPost]
@@ -91,10 +105,9 @@ namespace api.reserveerme.nu.Controllers
             appointmentViewModel.Body = reservation.Issuer;
             appointmentViewModel.Start = reservation.DateStart;
             appointmentViewModel.End = reservation.DateEnd;
-            appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
+            appointmentViewModel.Subject = reservation.RoomId.ToString();
             _exchangeLogic.CreateNewAppointment(appointmentViewModel);
             
-            await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
             return Created("/reservations", reservationViewModel);
         }
 
@@ -104,7 +117,7 @@ namespace api.reserveerme.nu.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest("Invalid data");
             }
             var reservation = new Reservation(reservationViewModel);
             
@@ -112,10 +125,17 @@ namespace api.reserveerme.nu.Controllers
             appointmentViewModel.Body = reservation.Issuer;
             appointmentViewModel.Start = reservation.DateStart;
             appointmentViewModel.End = reservation.DateEnd;
-            appointmentViewModel.Subject = "Reservation of " + reservation.RoomId.ToString();
-            _exchangeLogic.CreateNewAppointment(appointmentViewModel);
+            appointmentViewModel.Subject = reservation.RoomId.ToString();
+            try
+            {
+                _exchangeLogic.CreateNewAppointment(appointmentViewModel);
 
-            await _dataAccessProvider.Add(reservation, reservationViewModel.RoomId);
+            }
+            catch (AppointmentTimeSlotNotAvailableException e)
+            {
+                return BadRequest("Timeslot not available");
+            }
+
             return Created("/reservations", reservationViewModel);
         }
         
@@ -132,32 +152,6 @@ namespace api.reserveerme.nu.Controllers
             {
                 return NoContent();
             }
-        }
-        
-        [HttpPost]
-        [Route("calendar")]
-        public async Task<ActionResult<ReservationViewModel>> Add([FromBody]AppointmentViewModel appointmentViewModel)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
-
-                _exchangeLogic.CreateNewAppointment(appointmentViewModel);
-                return Created("/reservations/calendar", appointmentViewModel);
-            }
-            catch (AppointmentTimeSlotNotAvailableException e)
-            {
-                Console.WriteLine("TIMESLOT NOT AVAILABLE");
-                return Conflict("timeslot not available");
-            }
-            catch (CalenderEmptyException e)
-            {
-                return null;
-            }
-            
         }
     }
 }

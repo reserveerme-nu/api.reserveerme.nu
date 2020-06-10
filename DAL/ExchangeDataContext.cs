@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using api.reserveerme.nu.ViewModels;
 using Microsoft.Exchange.WebServices.Data;
+using Model.Enums;
 using Model.Exceptions;
 
 namespace DAL
@@ -56,13 +57,18 @@ namespace DAL
         
         public void CreateNewAppointment(AppointmentViewModel avm)
         {
+            var primeAttendee = new Attendee();
+            primeAttendee.Name = avm.Body;
+            
             var appointment = new Appointment(Service)
             {
                 Subject = avm.Subject,
                 Body = avm.Body,
                 Start = avm.Start,
                 End = avm.End,
-                Location = avm.Location
+                Location = avm.Location,
+                Categories = new StringList(){"Reserved"},
+                RequiredAttendees = { primeAttendee }
             };
             
             // Save the appointment to calendar.
@@ -72,6 +78,21 @@ namespace DAL
             var item = Item.Bind(Service, appointment.Id, new PropertySet(ItemSchema.Subject));
             
             Console.WriteLine("\nAppointment created: " + item.Subject + "\n");
+        }
+
+        public void SetRoomStatus(int roomId, StatusType statusType)
+        {
+            var appointments = GetAppointments();
+            var ourAppointment = appointments.First(appointment => appointment.Start < DateTime.Now && appointment.End > DateTime.Now);
+            
+            switch (statusType)
+            {
+                case StatusType.Occupied:
+                    if (ourAppointment != null) ourAppointment.Categories = new StringList() {"Occupied"};
+                    break;
+            }
+
+            if (ourAppointment != null) ourAppointment.Update(ConflictResolutionMode.AutoResolve);
         }
     }
 }
