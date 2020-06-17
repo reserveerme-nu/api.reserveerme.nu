@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.reserveerme.nu.ViewModels;
+using Logic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
-using Model.Interfaces;
-using Model.Models;
+using Model.ViewModels;
 
 namespace api.reserveerme.nu.Controllers
 {
@@ -14,34 +15,53 @@ namespace api.reserveerme.nu.Controllers
     [Route("rooms")]
     public class RoomController : ControllerBase
     {
-        private readonly IDataAccessProvider _dataAccessProvider;
-
-        public RoomController(IDataAccessProvider dataAccessProvider, ILogger<RoomController> logger)
+        public RoomController(IRoomLogic roomLogic, ILogger<RoomController> logger)
         {
+            _roomLogic = roomLogic;
             _logger = logger;
-            _dataAccessProvider = dataAccessProvider;
         }
-        
+
+        private readonly IRoomLogic _roomLogic;
         private readonly ILogger<RoomController> _logger;
 
-        [HttpGet]
-        [Route("{roomId}/{reservationId}")]
-        public async Task<ActionResult<ReservationViewModel>> Get(int roomId, int reservationId)
+        [HttpDelete]
+        public async Task<ActionResult<bool>> Delete([FromQuery] int roomId)
         {
-            var reservation = await _dataAccessProvider.Read(roomId, reservationId);
-            return Ok(new ReservationViewModel(reservation));
+            _roomLogic.RemoveRoom(roomId);
+            return Accepted();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<RoomViewModel>> Get([FromQuery] int roomId)
+        {
+            try
+            {
+                var room = _roomLogic.GetRoomById(roomId);
+                return Ok(room);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return NoContent();
+            }
+        }
+
+        [HttpGet]
+        [Route("getall")]
+        public async Task<ActionResult<List<RoomViewModel>>> GetAll()
+        {
+            return Ok(_roomLogic.GetAllRooms());
         }
 
         [HttpPost]
-        public async Task<ActionResult<RoomViewModel>> Post([FromBody]RoomViewModel roomViewModel)
+        public async Task<ActionResult<int>> Post([FromBody]RoomViewModel roomViewModel)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-            var room = new Room(roomViewModel);
-            await _dataAccessProvider.Create(room);
-            return Created("/rooms", roomViewModel);
+
+            int roomId = _roomLogic.AddRoom(roomViewModel);
+            return Created("/rooms", roomId);
         }
     }
 }

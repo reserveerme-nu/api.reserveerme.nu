@@ -1,23 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.WebSockets;
-using System.Threading;
 using System.Threading.Tasks;
-using api.reserveerme.nu.Tasks;
 using api.reserveerme.nu.ViewModels;
-using api.reserveerme.nu.WSControllers;
 using Logic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Exchange.WebServices.Data;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Model.Enums;
 using Model.Exceptions;
-using Model.Interfaces;
 using Model.Models;
 using Model.ViewModels;
-using Websocket.Client;
 
 
 namespace api.reserveerme.nu.Controllers
@@ -26,14 +18,12 @@ namespace api.reserveerme.nu.Controllers
     [Route("reservations")]
     public class ReservationController : ControllerBase
     {
-        private readonly IDataAccessProvider _dataAccessProvider;        
         private readonly ILogger<ReservationController> _logger;
         private readonly IExchangeLogic _exchangeLogic;
 
-        public ReservationController(IDataAccessProvider dataAccessProvider, ILogger<ReservationController> logger, IExchangeLogic exchangeLogic)
+        public ReservationController(ILogger<ReservationController> logger, IExchangeLogic exchangeLogic)
         {
             _logger = logger;
-            _dataAccessProvider = dataAccessProvider;
             _exchangeLogic = exchangeLogic;
         }
 
@@ -107,10 +97,13 @@ namespace api.reserveerme.nu.Controllers
             appointmentViewModel.Start = reservation.DateStart;
             appointmentViewModel.End = reservation.DateEnd;
             appointmentViewModel.Subject = reservation.RoomId.ToString();
+            appointmentViewModel.Location = reservation.RoomId.ToString();
             _exchangeLogic.CreateNewAppointment(appointmentViewModel);
             
             return Created("/reservations", reservationViewModel);
         }
+
+        
 
         [HttpPost]
         [Route("add")]
@@ -127,6 +120,7 @@ namespace api.reserveerme.nu.Controllers
             appointmentViewModel.Start = reservation.DateStart;
             appointmentViewModel.End = reservation.DateEnd;
             appointmentViewModel.Subject = reservation.RoomId.ToString();
+            appointmentViewModel.Location = reservation.RoomId.ToString();
             try
             {
                 _exchangeLogic.CreateNewAppointment(appointmentViewModel);
@@ -142,12 +136,12 @@ namespace api.reserveerme.nu.Controllers
         
         [HttpGet]
         [Route("calendar")]
-        public async Task<ActionResult<List<AppointmentViewModel>>> Get()
+        public async Task<ActionResult<List<AppointmentViewModel>>> Get([FromQuery] int roomId)
         {
             try
             {
                 var appointments = _exchangeLogic.GetAppointments();
-                return Ok(appointments);
+                return Ok(appointments.Where(model => model.Location == roomId.ToString()));
             }
             catch (CalenderEmptyException e)
             {

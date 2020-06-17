@@ -68,10 +68,9 @@ namespace Logic
 
         public bool EndCurrentAppointment(int roomId)
         {
-            // TODO: Implement roomid in deletion
             foreach (var appointment in exchange.GetAppointments())
             {
-                if (appointment.Start <= DateTime.Now && appointment.End <= DateTime.Now)
+                if (appointment.Start <= DateTime.Now && appointment.End <= DateTime.Now && appointment.Location == roomId.ToString())
                 {
                     appointment.Delete(DeleteMode.SoftDelete);
                     return true;
@@ -105,9 +104,9 @@ namespace Logic
 
         public AppointmentViewModel GetCurrentAppointment(int roomId)
         {
-            // TODO: Implement roomid in lookup
             foreach (var appointment in exchange.GetAppointments())
             {
+                if (appointment.Location != roomId.ToString()) continue;
                 if (appointment.Start <= DateTime.Now && appointment.End >= DateTime.Now)
                 {
                     string host;

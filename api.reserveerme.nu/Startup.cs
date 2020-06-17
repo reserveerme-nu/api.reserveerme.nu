@@ -1,22 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.reserveerme.nu.Tasks;
 using api.reserveerme.nu.Tasks.Scheduling;
-using DAL;
 using Logic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Model.Enums;
-using Model.Interfaces;
 
 namespace api.reserveerme.nu
 {
@@ -34,14 +24,13 @@ namespace api.reserveerme.nu
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContextPool<MySqlContext>(options => options.UseMySql(Configuration.GetConnectionString(nameof(MySql))));
-            services.AddScoped<IDataAccessProvider, DataAccessMySqlProvider>();
             services.AddScheduler((sender, args) =>
             {
                 Console.Write(args.Exception.Message);
                 args.SetObserved();
             });
             services.AddSingleton<IExchangeLogic, ExchangeLogic>();
+            services.AddSingleton<IRoomLogic, RoomLogic>();
             services.AddCors(options =>
             {
                 options.AddPolicy(MyAllowSpecificOrigins,
