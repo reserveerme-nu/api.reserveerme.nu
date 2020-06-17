@@ -37,6 +37,11 @@ namespace api.reserveerme.nu.Controllers
             _exchangeLogic = exchangeLogic;
         }
 
+        public ReservationController(IExchangeLogic exchangeLogic)
+        {
+            _exchangeLogic = exchangeLogic;
+        }
+
         [HttpGet]
         [Route("status/{roomId}")]
         public async Task<ActionResult<Status>> GetStatus(int roomId)
@@ -89,7 +94,7 @@ namespace api.reserveerme.nu.Controllers
         [Route("remove")]
         public async Task<ActionResult<bool>> Remove([FromBody]RemoveReservationViewModel viewModel)
         {
-            var didDeleteAppointment = _exchangeLogic.EndCurrentAppointment(1);
+            var didDeleteAppointment = _exchangeLogic.EndCurrentAppointment(viewModel.RoomId);
             return Ok(didDeleteAppointment);
         }
 
