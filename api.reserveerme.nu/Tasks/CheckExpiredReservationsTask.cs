@@ -30,8 +30,6 @@ namespace api.reserveerme.nu.Tasks
             var appointments = ExchangeLogic.GetAppointments();
             foreach (var appointment in appointments)
             {
-                var seks = DateTime.Compare(DateTime.Now, appointment.Start);
-                var neuk = DateTime.Compare(DateTime.Now, appointment.End);
                 if (DateTime.Compare(DateTime.Now, appointment.Start) > 0 && DateTime.Compare(DateTime.Now, appointment.End) < 0)
                 {
                     var date = appointment.Start;
@@ -41,6 +39,16 @@ namespace api.reserveerme.nu.Tasks
                         WebsocketRepository.GetWebSocketServer().WebSocketServices.BroadcastAsync("update", () => {});
                     }
                 }
+            }
+
+            if (AppointmentRepository.GetAppointments() == null)
+            {
+                AppointmentRepository.SetAppointments(appointments);
+            }
+
+            if (!AppointmentRepository.GetAppointments().Equals(appointments))
+            {
+                WebsocketRepository.GetWebSocketServer().WebSocketServices.BroadcastAsync("update", () => {});
             }
         }
     }

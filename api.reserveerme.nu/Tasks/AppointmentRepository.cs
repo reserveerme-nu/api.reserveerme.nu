@@ -5,21 +5,16 @@ namespace api.reserveerme.nu.Tasks
 {
     public static class AppointmentRepository
     {
-        public static List<AppointmentViewModel> Appointments;
+        private static IEnumerable<AppointmentViewModel> _appointments;
 
-        public static List<AppointmentViewModel> getAppointments()
+        public static IEnumerable<AppointmentViewModel> GetAppointments()
         {
-            if (Appointments == null)
-            {
-                Appointments = new List<AppointmentViewModel>();
-            }
-            
-            return Appointments;
+            return _appointments;
         }
 
-        public static void setAppointments(List<AppointmentViewModel> appointments)
+        public static void SetAppointments(IEnumerable<AppointmentViewModel> appointments)
         {
-            Appointments = appointments;
+            _appointments = appointments;
         }
     }
 }
