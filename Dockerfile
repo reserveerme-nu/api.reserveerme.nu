@@ -8,6 +8,7 @@ COPY api.reserveerme.nu/*.csproj ./api.reserveerme.nu/
 COPY DAL/*.csproj ./DAL/
 COPY Logic/*.csproj ./Logic/
 COPY Model/*.csproj ./Model/
+COPY Tests/*.csproj ./Tests/
 RUN dotnet restore
 
 # copy everything else and build app
