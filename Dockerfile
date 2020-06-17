@@ -8,6 +8,7 @@ COPY api.reserveerme.nu/*.csproj ./api.reserveerme.nu/
 COPY DAL/*.csproj ./DAL/
 COPY Logic/*.csproj ./Logic/
 COPY Model/*.csproj ./Model/
+COPY Tests/*.csproj ./Tests/
 RUN dotnet restore
 
 # copy everything else and build app
@@ -15,6 +16,7 @@ COPY api.reserveerme.nu/. ./api.reserveerme.nu/
 COPY DAL/. ./DAL/
 COPY Logic/. ./Logic/
 COPY Model/. ./Model/
+COPY Tests/. ./Tests/
 WORKDIR /source/api.reserveerme.nu
 RUN dotnet publish -c release -o /app
 
