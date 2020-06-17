@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using api.reserveerme.nu.Tasks;
 using api.reserveerme.nu.ViewModels;
 using api.reserveerme.nu.WSControllers;
 using Logic;

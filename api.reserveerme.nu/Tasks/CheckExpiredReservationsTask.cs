@@ -26,30 +26,31 @@ namespace api.reserveerme.nu.Tasks
         }
         
         public async Task ExecuteAsync(CancellationToken cancellationToken)
-        {
-            var appointments = ExchangeLogic.GetAppointments();
-            foreach (var appointment in appointments)
-            {
-                if (DateTime.Compare(DateTime.Now, appointment.Start) > 0 && DateTime.Compare(DateTime.Now, appointment.End) < 0)
-                {
-                    var date = appointment.Start;
-                    if (DateTime.Compare(DateTime.Now, date.AddMinutes(1)) > 0 && appointment.Status != "Occupied");
-                    {
-                        ExchangeLogic.EndAppointment(appointment);
-                        WebsocketRepository.GetWebSocketServer().WebSocketServices.BroadcastAsync("update", () => {});
-                    }
-                }
-            }
+         {
+             var appointments = ExchangeLogic.GetAppointments();
+             if (AppointmentRepository.GetAppointments() == null)
+             {
+                 AppointmentRepository.SetAppointments(appointments);
+             }
 
-            if (AppointmentRepository.GetAppointments() == null)
-            {
-                AppointmentRepository.SetAppointments(appointments);
-            }
+             if (!AppointmentRepository.GetAppointments().Equals(appointments))
+             {
+                 WebsocketRepository.GetWebSocketServer().WebSocketServices.BroadcastAsync("update", () => {});
+                 return;
+             }
 
-            if (!AppointmentRepository.GetAppointments().Equals(appointments))
-            {
-                WebsocketRepository.GetWebSocketServer().WebSocketServices.BroadcastAsync("update", () => {});
-            }
-        }
+             foreach (var appointment in appointments)
+             {
+                 if (DateTime.Compare(DateTime.Now, appointment.Start) > 0 && DateTime.Compare(DateTime.Now, appointment.End) < 0)
+                 {
+                     var date = appointment.Start;
+                     if (DateTime.Compare(DateTime.Now, date.AddMinutes(1)) > 0 && appointment.Status != "Occupied");
+                     {
+                         ExchangeLogic.EndAppointment(appointment);
+                         WebsocketRepository.GetWebSocketServer().WebSocketServices.BroadcastAsync("update", () => {});
+                     }
+                 }
+             }
+         }
     }
 }
