@@ -5,7 +5,9 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using api.reserveerme.nu.Tasks.Scheduling;
+using api.reserveerme.nu.WSControllers;
 using DAL;
+using Logic;
 using Microsoft.EntityFrameworkCore;
 using Model.Models;
 using Newtonsoft.Json;
@@ -16,26 +18,27 @@ namespace api.reserveerme.nu.Tasks
     public class CheckExpiredReservationsTask : IScheduledTask
     {
         public string Schedule => "*/1 * * * *";
+        public IExchangeLogic ExchangeLogic;
+
+        public CheckExpiredReservationsTask(IExchangeLogic exchangeLogic)
+        {
+            ExchangeLogic = exchangeLogic;
+        }
         
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            var contextFactory = new DesignTimeDbContextFactory();
-            var context = contextFactory.CreateDbContext(new string[0]);
-            var rooms = await context.Rooms
-                .Include(b => b.Reservations)
-                .ToListAsync(cancellationToken);
-            foreach (var room in rooms)
+            var appointments = ExchangeLogic.GetAppointments();
+            foreach (var appointment in appointments)
             {
-                foreach (var reservation in room.Reservations)
+                var seks = DateTime.Compare(DateTime.Now, appointment.Start);
+                var neuk = DateTime.Compare(DateTime.Now, appointment.End);
+                if (DateTime.Compare(DateTime.Now, appointment.Start) > 0 && DateTime.Compare(DateTime.Now, appointment.End) < 0)
                 {
-                    if (DateTime.Compare(DateTime.Now, reservation.DateStart) > 0 && DateTime.Compare(DateTime.Now, reservation.DateEnd) < 0)
+                    var date = appointment.Start;
+                    if (DateTime.Compare(DateTime.Now, date.AddMinutes(1)) > 0 && appointment.Status != "Occupied");
                     {
-                        var date = reservation.DateStart;
-                        if (reservation.MeetingDateStart == DateTime.MinValue && DateTime.Compare(DateTime.Now, date.AddMinutes(1)) > 0)
-                        {
-                            reservation.DateEnd = DateTime.Now;
-                            await context.SaveChangesAsync(cancellationToken);
-                        }
+                        ExchangeLogic.EndAppointment(appointment);
+                        WebsocketRepository.GetWebSocketServer().WebSocketServices.BroadcastAsync("update", () => {});
                     }
                 }
             }

@@ -35,8 +35,7 @@ namespace api.reserveerme.nu
         {
             services.AddControllers();
             services.AddDbContextPool<MySqlContext>(options => options.UseMySql(Configuration.GetConnectionString(nameof(MySql))));
-            services.AddScoped<IDataAccessProvider, DataAccessMySqlProvider>();        
-            services.AddSingleton<IScheduledTask, CheckExpiredReservationsTask>();
+            services.AddScoped<IDataAccessProvider, DataAccessMySqlProvider>();
             services.AddScheduler((sender, args) =>
             {
                 Console.Write(args.Exception.Message);
@@ -52,6 +51,7 @@ namespace api.reserveerme.nu
                         builder.WithHeaders("*");
                     });
             });
+            services.AddSingleton<IScheduledTask, CheckExpiredReservationsTask>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

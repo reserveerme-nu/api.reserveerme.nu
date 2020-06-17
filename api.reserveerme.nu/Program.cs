@@ -15,7 +15,7 @@ namespace api.reserveerme.nu
     {
         public static void Main(string[] args)
         {
-            var wsServer = new WebSocketServer(6969);
+            var wsServer = WebsocketRepository.GetWebSocketServer();
             wsServer.AddWebSocketService<ReservationWebSocketController>("/reservation");
             wsServer.Start();
             CreateHostBuilder(args).Build().Run();

@@ -81,6 +81,18 @@ namespace Logic
             return false;
         }
 
+        public bool EndAppointment(AppointmentViewModel a)
+        {
+            var appointment = exchange.GetAppointments().FirstOrDefault(p => p.Id.UniqueId == a.Id);
+            if (appointment != null)
+            {
+                appointment.Delete(DeleteMode.SoftDelete);
+                return true;
+            }
+
+            return false;
+        }
+
         public void SetCredentials(string username, string password)
         {
             exchange.SetCredentials(username, password);
