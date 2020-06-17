@@ -15,6 +15,7 @@ COPY api.reserveerme.nu/. ./api.reserveerme.nu/
 COPY DAL/. ./DAL/
 COPY Logic/. ./Logic/
 COPY Model/. ./Model/
+COPY Tests/. ./Tests/
 WORKDIR /source/api.reserveerme.nu
 RUN dotnet publish -c release -o /app
 
